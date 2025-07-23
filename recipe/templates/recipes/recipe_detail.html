@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+{% block content %}
+    <style>
+        .recipe-detail-card {
+            max-width: 700px; /* Constrain card width for medium-sized layout */
+            margin: 0 auto; /* Center the card */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .recipe-detail-card .card-img-top {
+            width: 100%;
+            height: 300px; /* Medium height for detail view */
+            object-fit: cover; /* Ensure image scales uniformly */
+            display: block;
+        }
+        .recipe-detail-card .card-body {
+            padding: 20px;
+        }
+        .recipe-detail-card .card-body p {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .recipe-detail-card .card-body h3 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .btn-back {
+            margin-top: 1.5rem;
+            display: inline-block;
+        }
+    </style>
+    <div class="card recipe-detail-card">
+        {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+        {% else %}
+            <img src="https://via.placeholder.com/500x300?text=No+Image" class="card-img-top" alt="No image available">
+        {% endif %}
+        <div class="card-body">
+            <h1>{{ recipe.title }}</h1>
+            <p><strong>Category:</strong> {{ recipe.category.name }}</p>
+            <p><strong>Difficulty:</strong> {{ recipe.get_difficulty_display }}</p>
+            <p><strong>Cooking Time:</strong> {{ recipe.cooking_time }} minutes</p>
+            <p><strong>Author:</strong> {{ recipe.author.username }}</p>
+            {% if user.is_authenticated %}
+                <p><strong>Status:</strong> {{ recipe.get_status_display }}</p>
+            {% endif %}
+            <h3>Ingredients</h3>
+            <p>{{ recipe.ingredients|linebreaks }}</p>
+            <h3>Instructions</h3>
+            <p>{{ recipe.instructions|linebreaks }}</p>
+        </div>
+    </div>
+    <a href="{% url 'recipe_list' %}" class="btn btn-secondary btn-back">Back to Recipes</a>
+{% endblock %}
+</body>
+</html>

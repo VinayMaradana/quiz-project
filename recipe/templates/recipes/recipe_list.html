@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+{% block content %}
+    <style>
+        /* Existing CSS for uniform card sizes */
+        .recipe-card {
+            margin-bottom: 20px;
+        }
+        .recipe-card .card {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .recipe-card .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+        .recipe-card .card-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+        .recipe-card .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+        .recipe-card .card-text {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Adjusted to accommodate status */
+            -webkit-box-orient: vertical;
+        }
+        .recipe-card .btn {
+            margin-top: auto;
+            width: 100%;
+        }
+    </style>
+    <h1>Recipes</h1>
+    <form class="mb-3" method="get">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search recipes..." value="{{ search_query|default:'' }}">
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+    <div class="row">
+        {% for recipe in recipes %}
+            <div class="col-md-4 recipe-card">
+                <div class="card">
+                    {% if recipe.image %}
+                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No image available">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <p class="card-text">
+                            Category: {{ recipe.category.name }}<br>
+                            Difficulty: {{ recipe.get_difficulty_display }}<br>
+                            Cooking Time: {{ recipe.cooking_time }} minutes<br>
+                            {% if user.is_authenticated %}
+                                Status: {{ recipe.get_status_display }}<br>
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary">View Recipe</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No recipes found.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
+</body>
+</html>
